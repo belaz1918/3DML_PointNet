@@ -23,9 +23,13 @@ def step(points, model):
     # TODO : Implement step function for AutoEncoder. 
     # Hint : Use chamferDist defined in above
     # Hint : You can compute chamfer distance between two point cloud pc1 and pc2 by chamfer_distance(pc1, pc2)
-    
-    preds = None
-    loss = None
+    points = points.to(device)
+
+    preds = model(points)  # Forward pass through AutoEncoder
+    loss, _ = chamfer_distance(points, preds)  # Compute Chamfer distance
+
+    # preds = None
+    # loss = None
 
     return loss, preds
 
@@ -34,6 +38,11 @@ def train_step(points, model, optimizer):
     loss, preds = step(points, model)
 
     # TODO : Implement backpropagation using optimizer and loss
+    optimizer.zero_grad()  # Reset gradients
+    loss.backward()  # Backpropagate loss
+    optimizer.step()  # Update model weights
+
+    return loss.item(), preds
 
     return loss, preds
 

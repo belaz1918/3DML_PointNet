@@ -25,22 +25,43 @@ def step(points, pc_labels, class_labels, model):
     """
     
     # TODO : Implement step function for segmentation.
+    
 
-    loss = None
-    logits = None
-    preds = None
+    # Move inputs to the correct device
+    points = points.to(device)
+    pc_labels = pc_labels.to(device)
+    class_labels = class_labels.to(device)
+
+    
+    logits = model(points)  # logits shape: [B, C, N]
+
+    
+    loss = F.cross_entropy(logits, pc_labels)
+
+    
+    preds = torch.argmax(logits, dim=1)  # preds shape: [B, N]
+
     return loss, logits, preds
 
 
 def train_step(points, pc_labels, class_labels, model, optimizer, train_acc_metric):
+    
     loss, logits, preds = step(
         points, pc_labels, class_labels, model
     )
     train_batch_acc = train_acc_metric(preds, pc_labels.to(device))
 
     # TODO : Implement backpropagation using optimizer and loss
+    
 
-    return loss, train_batch_acc
+
+
+    # Backpropagation
+    optimizer.zero_grad()  
+    loss.backward()        
+    optimizer.step()       
+
+    return loss.item(), train_batch_acc
 
 
 def validation_step(
