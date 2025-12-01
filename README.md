@@ -22,13 +22,62 @@ This project implements **PointNet**, a pioneering deep learning architecture de
 
 ## Architecture
 
+PointNet's modular design enables multiple downstream tasks through a shared feature extraction backbone. Below are the four key architectures implemented in this project:
+
+### 0. Global Feature Extraction
+
+![Feature Extraction](Figure/feat.png)
+
+The **PointNetFeat** module serves as the backbone for extracting global features from point clouds. It takes N×3 point coordinates as input and produces a 1024-dimensional global descriptor through:
+- Input and feature transformation networks (T-Nets) for spatial alignment
+- Shared MLPs for point-wise feature learning
+- Max pooling for permutation-invariant global feature aggregation
+
+This global feature vector captures the geometric essence of the entire point cloud and is used by all downstream task networks.
+
+### 1. Point Cloud Classification
+
 ![Classification Network](Figure/cls.png)
-*PointNet Classification Network*
+
+The **PointNetCls** architecture extends the feature extraction backbone with classification heads. After obtaining the 1024-d global feature, it applies:
+- Fully connected layers (512 → 256 → k classes)
+- Batch normalization and ReLU activations
+- Dropout for regularization
+- Final softmax for category prediction
+
+**Performance**: 88.6% accuracy on ModelNet40 (40 object categories)
+
+### 2. Point Cloud Part Segmentation
 
 ![Segmentation Network](Figure/seg.png)
-*PointNet Part Segmentation Network*
 
-PointNet extracts global features from unordered point sets using symmetric functions (max pooling), making it invariant to input permutations. The architecture employs spatial transformer networks (T-Nets) for canonical alignment of input data and features.
+The **PointNetPartSeg** architecture combines local and global features for per-point semantic labeling:
+- Concatenates point-wise features with the global descriptor
+- Shared MLPs process the combined features
+- Outputs m-dimensional logits for each point (m = number of part categories)
+- Enables fine-grained understanding of object geometry
+
+**Performance**: 83.6% instance mIoU on ShapeNet Parts dataset
+
+### 3. Point Cloud Auto-Encoding
+
+![Auto-Encoding Network](Figure/ae.png)
+
+The **PointNetAutoEncoder** learns compressed representations through reconstruction:
+- **Encoder**: PointNetFeat extracts 1024-d latent codes
+- **Decoder**: MLPs progressively expand latent vector (1024 → 2048 → N×3)
+- Reconstructs N points in 3D space
+- Learns meaningful shape representations without labels
+
+**Performance**: 0.0043 Chamfer distance on ModelNet40
+
+---
+
+**Common Design Principles:**
+- All architectures use spatial transformer networks (T-Nets) for input alignment
+- Max pooling ensures permutation invariance
+- Shared MLPs enable efficient point-wise feature learning
+- Modular design allows easy extension to new taskspermutations. The architecture employs spatial transformer networks (T-Nets) for canonical alignment of input data and features.
 
 ## Results
 
@@ -192,4 +241,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 *For questions or collaboration opportunities, feel free to open an issue or reach out!*
+
 
