@@ -189,12 +189,7 @@ For further exploration of point cloud deep learning:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
-
-- Original PointNet paper authors for the groundbreaking architecture
-- PyTorch team for the deep learning framework
-- ModelNet and ShapeNet dataset creators
-
 ---
 
 *For questions or collaboration opportunities, feel free to open an issue or reach out!*
+
